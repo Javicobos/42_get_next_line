@@ -6,7 +6,7 @@
 /*   By: jcobos-d <jcobos-d@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/16 15:47:18 by jcobos-d          #+#    #+#             */
-/*   Updated: 2022/05/02 22:47:07 by jcobos-d         ###   ########.fr       */
+/*   Updated: 2022/05/03 14:56:47 by jcobos-d         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 char	*get_next_line(int fd);
 char	*ft_strjoin_len(char *s1, char *s2, int len_2);
+char	*nl_saved(char **savedline);
 
 
 char *get_next_line(int fd)
@@ -25,18 +26,7 @@ char *get_next_line(int fd)
 	int		newcharacters;
 
 	if (savedline && ft_strchr(savedline, '\n'))
-	{
-		postbuffer = ft_strchr(savedline, '\n');
-		newcharacters = postbuffer - savedline + 1;
-		returnline = malloc(newcharacters + 1);
-		ft_strlcpy(returnline, savedline, newcharacters + 1);
-		free(savedline);
-		if (ft_strlen(postbuffer) > 1)
-			savedline = ft_strdup(postbuffer + 1);
-		else
-			savedline = 0;
-		return (returnline);
-	}
+		return (nl_saved(&savedline));
 	mybuffer = malloc(BUFFER_SIZE + 1);
 	if (!(mybuffer))
 		return (0);
@@ -44,7 +34,7 @@ char *get_next_line(int fd)
 	if (readreturn == -1)
 	{
 		free(mybuffer);
-		return 0;
+		return (0);
 	}
 	if (readreturn == 0)
 	{
@@ -67,7 +57,7 @@ char *get_next_line(int fd)
 	postbuffer = ft_strchr(mybuffer, '\n');
 	if (postbuffer)
 	{
-		int newcharacters = postbuffer - mybuffer + 1;
+		newcharacters = postbuffer - mybuffer + 1;
 		returnline = ft_strjoin_len(savedline, mybuffer, newcharacters);
 		if (ft_strlen(postbuffer) > 1)
 			savedline = ft_strdup(postbuffer + 1);
@@ -105,4 +95,22 @@ char	*ft_strjoin_len(char *s1, char *s2, int len_2)
 	free(s1);
 	free(s2);
 	return (goal);
+}
+
+char	*nl_saved(char **savedline)
+{
+	char	*postbuffer;
+	char	*returnline;
+	int		newcharacters;
+
+	postbuffer = ft_strchr(*savedline, '\n');
+	newcharacters = postbuffer - *savedline + 1;
+	returnline = malloc(newcharacters + 1);
+	ft_strlcpy(returnline, *savedline, newcharacters + 1);
+	free(*savedline);
+	if (ft_strlen(postbuffer) > 1)
+		*savedline = ft_strdup(postbuffer + 1);
+	else
+		*savedline = 0;
+	return (returnline);
 }
