@@ -6,7 +6,7 @@
 /*   By: jcobos-d <jcobos-d@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/16 15:47:18 by jcobos-d          #+#    #+#             */
-/*   Updated: 2022/05/03 14:56:47 by jcobos-d         ###   ########.fr       */
+/*   Updated: 2022/05/03 15:35:06 by jcobos-d         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,64 +15,32 @@
 char	*get_next_line(int fd);
 char	*ft_strjoin_len(char *s1, char *s2, int len_2);
 char	*nl_saved(char **savedline);
+char	*read_problems(char **savedline, char *mybuffer, ssize_t readreturn);
+char	*line_returner(char **savedline, char *mybuffer, ssize_t readreturn);
 
-
-char *get_next_line(int fd)
+char	*get_next_line(int fd)
 {
 	static char	*savedline;
-	char	*mybuffer;
-	char	*returnline;
-	char	*postbuffer;
-	int		newcharacters;
+	char		*mybuffer;
+	ssize_t		readreturn;
 
 	if (savedline && ft_strchr(savedline, '\n'))
 		return (nl_saved(&savedline));
 	mybuffer = malloc(BUFFER_SIZE + 1);
 	if (!(mybuffer))
 		return (0);
-	ssize_t readreturn = read(fd, mybuffer, BUFFER_SIZE);
-	if (readreturn == -1)
-	{
-		free(mybuffer);
-		return (0);
-	}
-	if (readreturn == 0)
-	{
-		free(mybuffer);
-		if (savedline)
-		{
-			returnline = ft_strdup(savedline);
-			free(savedline);
-			savedline = 0;
-			return (returnline);
-		}
-		return (0);
-	}
+	readreturn = read(fd, mybuffer, BUFFER_SIZE);
+	if (readreturn == -1 || readreturn == 0)
+		return (read_problems(&savedline, mybuffer, readreturn));
 	mybuffer[readreturn] = '\0';
 	if (!savedline)
 	{
 		savedline = malloc(5);
 		savedline[0] = '\0';
 	}
-	postbuffer = ft_strchr(mybuffer, '\n');
-	if (postbuffer)
-	{
-		newcharacters = postbuffer - mybuffer + 1;
-		returnline = ft_strjoin_len(savedline, mybuffer, newcharacters);
-		if (ft_strlen(postbuffer) > 1)
-			savedline = ft_strdup(postbuffer + 1);
-		else
-			savedline = 0;
-		return (returnline);
-	}
-	if (readreturn < BUFFER_SIZE) //file ended, no /n found
-	{
-		returnline = ft_strjoin_len(savedline, mybuffer, readreturn);
-		savedline = 0;
-		return (returnline);
-	}
-
-	savedline = ft_strjoin_len(savedline, mybuffer, ft_strlen(mybuffer)); //and then we have to read again
+	if (ft_strchr(mybuffer, '\n') || readreturn < BUFFER_SIZE)
+		return (line_returner(&savedline, mybuffer, readreturn));
+	savedline = ft_strjoin_len(savedline, mybuffer, ft_strlen(mybuffer));
 	return (get_next_line(fd));
 }
 
@@ -82,10 +50,8 @@ char	*ft_strjoin_len(char *s1, char *s2, int len_2)
 	int		len_1;
 	int		len_goal;
 
-	//printf("we start \n");
 	len_1 = ft_strlen((char *)s1);
 	len_goal = len_1 + len_2;
-	//printf("we mid \n");
 	goal = malloc(len_goal + 1);
 	if (!goal)
 		return (0);
@@ -112,5 +78,44 @@ char	*nl_saved(char **savedline)
 		*savedline = ft_strdup(postbuffer + 1);
 	else
 		*savedline = 0;
+	return (returnline);
+}
+
+char	*read_problems(char **savedline, char *mybuffer, ssize_t readreturn)
+{
+	char	*returnline;
+
+	free(mybuffer);
+	if (readreturn == 0 && *savedline)
+	{
+		returnline = ft_strdup(*savedline);
+		free(*savedline);
+		*savedline = 0;
+		return (returnline);
+	}
+	return (0);
+}
+
+char	*line_returner(char **savedline, char *mybuffer, ssize_t readreturn)
+{
+	char	*postbuffer;
+	int		newcharacters;
+	char	*returnline;
+
+	postbuffer = ft_strchr(mybuffer, '\n');
+	if (postbuffer)
+	{
+		newcharacters = postbuffer - mybuffer + 1;
+		returnline = ft_strjoin_len(*savedline, mybuffer, newcharacters);
+		if (ft_strlen(postbuffer) > 1)
+			*savedline = ft_strdup(postbuffer + 1);
+		else
+			*savedline = 0;
+	}
+	else
+	{
+		returnline = ft_strjoin_len(*savedline, mybuffer, readreturn);
+		*savedline = 0;
+	}
 	return (returnline);
 }
