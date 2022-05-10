@@ -6,7 +6,7 @@
 /*   By: jcobos-d <jcobos-d@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/16 15:48:26 by jcobos-d          #+#    #+#             */
-/*   Updated: 2022/05/02 21:40:59 by jcobos-d         ###   ########.fr       */
+/*   Updated: 2022/05/10 17:29:10 by jcobos-d         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,20 +66,12 @@ char	*ft_strdup(const char *src)
 	return (goal);
 }
 
-size_t	ft_strlcpy(char *dest, const char *src, size_t size)
+/*
+char	*rec(char **savedline, char *mybuffer, int savedlen, int readreturn)
 {
-	size_t	len_src_return;
-	size_t	bytes_to_copy;
-
-	len_src_return = ft_strlen(src);
-	if (size > 0)
-	{
-		if (len_src_return >= size - 1)
-			bytes_to_copy = size - 1;
-		else
-			bytes_to_copy = len_src_return;
-		ft_memcpy((void *)dest, (void *)src, bytes_to_copy);
-		dest[bytes_to_copy] = '\0';
-	}
-	return (len_src_return);
+	if (savedlen % 500 + readreturn + 1 >= 500)
+		return (ft_strjoin_len(savedline, mybuffer, readreturn, 500));
+	ft_memcpy((void *)*savedline + savedlen, (void *)mybuffer, readreturn + 1);
+	return (savedline);
 }
+*/

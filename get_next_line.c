@@ -6,7 +6,7 @@
 /*   By: jcobos-d <jcobos-d@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/16 15:47:18 by jcobos-d          #+#    #+#             */
-/*   Updated: 2022/05/10 16:08:43 by jcobos-d         ###   ########.fr       */
+/*   Updated: 2022/05/10 17:41:03 by jcobos-d         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ char	*get_next_line(int fd)
 	if (savedline && ft_strchr(savedline, '\n'))
 		return (nl_saved(&savedline));
 	mybuffer = malloc(BUFFER_SIZE + 1);
-	if (!(mybuffer))
+	if (!mybuffer)
 		return (0);
 	readreturn = read(fd, mybuffer, BUFFER_SIZE);
 	if (readreturn == -1 || readreturn == 0)
@@ -35,7 +35,7 @@ char	*get_next_line(int fd)
 	mybuffer[readreturn] = '\0';
 	if (ft_strchr(mybuffer, '\n') || readreturn < BUFFER_SIZE)
 		return (line_returner(&savedline, mybuffer, readreturn));
-	savedline = ft_strjoin_len(savedline, mybuffer, ft_strlen(mybuffer));
+	savedline = ft_strjoin_len(savedline, mybuffer, readreturn);
 	free(mybuffer);
 	return (get_next_line(fd));
 }
@@ -50,7 +50,10 @@ char	*ft_strjoin_len(char *s1, char *s2, int len_2)
 	len_goal = len_1 + len_2;
 	goal = malloc(len_goal + 1);
 	if (!goal)
+	{
+		free(s1);
 		return (0);
+	}
 	ft_memcpy(goal, s1, len_1);
 	ft_memcpy(goal + len_1, s2, len_2);
 	goal[len_goal] = '\0';
@@ -64,10 +67,16 @@ char	*nl_saved(char **savedline)
 	char	*returnline;
 	int		newcharacters;
 
-	postbuffer = ft_strdup(ft_strchr(*savedline, '\n'));
 	newcharacters = ft_strchr(*savedline, '\n') - *savedline + 1;
 	returnline = malloc(newcharacters + 1);
-	ft_strlcpy(returnline, *savedline, newcharacters + 1);
+	if (!returnline)
+	{
+		free(*savedline);
+		return (0);
+	}
+	ft_memcpy((void *)returnline, (void *)*savedline, newcharacters);
+	returnline[newcharacters] = '\0';
+	postbuffer = ft_strdup(ft_strchr(*savedline, '\n'));
 	free(*savedline);
 	if (ft_strlen(postbuffer) > 1)
 		*savedline = ft_strdup(postbuffer + 1);
