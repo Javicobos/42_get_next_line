@@ -6,7 +6,7 @@
 /*   By: jcobos-d <jcobos-d@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/16 15:47:18 by jcobos-d          #+#    #+#             */
-/*   Updated: 2022/05/03 15:35:06 by jcobos-d         ###   ########.fr       */
+/*   Updated: 2022/05/10 16:08:43 by jcobos-d         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,14 +33,10 @@ char	*get_next_line(int fd)
 	if (readreturn == -1 || readreturn == 0)
 		return (read_problems(&savedline, mybuffer, readreturn));
 	mybuffer[readreturn] = '\0';
-	if (!savedline)
-	{
-		savedline = malloc(5);
-		savedline[0] = '\0';
-	}
 	if (ft_strchr(mybuffer, '\n') || readreturn < BUFFER_SIZE)
 		return (line_returner(&savedline, mybuffer, readreturn));
 	savedline = ft_strjoin_len(savedline, mybuffer, ft_strlen(mybuffer));
+	free(mybuffer);
 	return (get_next_line(fd));
 }
 
@@ -59,7 +55,6 @@ char	*ft_strjoin_len(char *s1, char *s2, int len_2)
 	ft_memcpy(goal + len_1, s2, len_2);
 	goal[len_goal] = '\0';
 	free(s1);
-	free(s2);
 	return (goal);
 }
 
@@ -69,8 +64,8 @@ char	*nl_saved(char **savedline)
 	char	*returnline;
 	int		newcharacters;
 
-	postbuffer = ft_strchr(*savedline, '\n');
-	newcharacters = postbuffer - *savedline + 1;
+	postbuffer = ft_strdup(ft_strchr(*savedline, '\n'));
+	newcharacters = ft_strchr(*savedline, '\n') - *savedline + 1;
 	returnline = malloc(newcharacters + 1);
 	ft_strlcpy(returnline, *savedline, newcharacters + 1);
 	free(*savedline);
@@ -78,6 +73,7 @@ char	*nl_saved(char **savedline)
 		*savedline = ft_strdup(postbuffer + 1);
 	else
 		*savedline = 0;
+	free(postbuffer);
 	return (returnline);
 }
 
@@ -117,5 +113,6 @@ char	*line_returner(char **savedline, char *mybuffer, ssize_t readreturn)
 		returnline = ft_strjoin_len(*savedline, mybuffer, readreturn);
 		*savedline = 0;
 	}
+	free(mybuffer);
 	return (returnline);
 }
