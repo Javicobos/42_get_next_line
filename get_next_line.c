@@ -6,7 +6,7 @@
 /*   By: jcobos-d <jcobos-d@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/16 15:47:18 by jcobos-d          #+#    #+#             */
-/*   Updated: 2022/05/10 17:41:03 by jcobos-d         ###   ########.fr       */
+/*   Updated: 2022/05/11 12:30:57 by jcobos-d         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,12 @@ char	*get_next_line(int fd)
 		return (nl_saved(&savedline));
 	mybuffer = malloc(BUFFER_SIZE + 1);
 	if (!mybuffer)
+	{
+		if (savedline)
+			free(savedline);
+		savedline = 0;
 		return (0);
+	}
 	readreturn = read(fd, mybuffer, BUFFER_SIZE);
 	if (readreturn == -1 || readreturn == 0)
 		return (read_problems(&savedline, mybuffer, readreturn));

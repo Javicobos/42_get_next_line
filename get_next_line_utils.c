@@ -6,7 +6,7 @@
 /*   By: jcobos-d <jcobos-d@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/16 15:48:26 by jcobos-d          #+#    #+#             */
-/*   Updated: 2022/05/10 17:29:10 by jcobos-d         ###   ########.fr       */
+/*   Updated: 2022/05/11 12:32:04 by jcobos-d         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,13 +65,3 @@ char	*ft_strdup(const char *src)
 	ft_memcpy(goal, src, len + 1);
 	return (goal);
 }
-
-/*
-char	*rec(char **savedline, char *mybuffer, int savedlen, int readreturn)
-{
-	if (savedlen % 500 + readreturn + 1 >= 500)
-		return (ft_strjoin_len(savedline, mybuffer, readreturn, 500));
-	ft_memcpy((void *)*savedline + savedlen, (void *)mybuffer, readreturn + 1);
-	return (savedline);
-}
-*/
